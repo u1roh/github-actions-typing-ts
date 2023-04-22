@@ -1,9 +1,39 @@
 import * as jsyaml from "js-yaml"
 
 type OnWorkflowCall = {
-  inputs: { [key: string]: { description: string, required: boolean, default: string } }
-  outputs: { [key: string]: { description: string, value: string } }
-  secrets: { [key: string]: string }
+  inputs: {
+    [key: string]: {
+      description: string
+      required: boolean
+      default?: string
+      type: "string" | "boolean" | "number"
+    }
+  }
+  outputs: {
+    [key: string]: { description: string, value: string }
+  }
+  secrets: {
+    [key: string]: string
+  }
+}
+
+type OnWorkflowRun = {
+  workflows: string[]
+  types?: string[]
+  branches?: string[]
+  "branches-ignore"?: string[]
+}
+
+type OnWorkflowDispatch = {
+  inputs: {
+    [key: string]: {
+      description: string
+      required: boolean
+      default?: string
+      type: "string" | "boolean" | "number" | "environment" | "choice"
+      options?: string[]
+    }
+  }
 }
 
 type WorkflowTrigger =
@@ -15,6 +45,8 @@ type WorkflowTrigger =
   | { issues: { types: string[] } }
   | { schedule: { cron: string }[] }
   | { workflow_call: OnWorkflowCall }
+  | { workflow_run: OnWorkflowRun }
+  | { workflow_dispatch: OnWorkflowDispatch }
 
 type Workflow = {
   name: string
@@ -32,7 +64,17 @@ const exampleWorkflow: Workflow = {
         branches: ["master"],
       }
     },
-    { push: { branches: ["master"] }}
+    {
+      workflow_dispatch: {
+        inputs: {
+          name: {
+            description: "Who to greet",
+            required: true,
+            type: "string"
+          }
+        }
+      }
+    }
   ]
 }
 
