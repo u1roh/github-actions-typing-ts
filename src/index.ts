@@ -148,6 +148,29 @@ type Workflow = {
   jobs: { [key: string]: Job }
 }
 
+function checkout(args: {
+    repository?: string
+    ref?: string
+    token?: string
+    "ssh-key"?: string
+    "ssh-known-hosts"?: string
+    "ssh-strict"?: string
+    "persist-credentials"?: string
+    path?: string
+    clean?: string
+    "fetch-depth"?: string
+    lfs?: string
+    submodules?: string
+    "set-safe-directory"?: string
+    "github-server-url"?: string
+}) {
+  return {
+    uses: "actions/checkout@v3",
+    with: args
+  }
+}
+
+
 // Example
 const exampleWorkflow: Workflow = {
   name: "hello",
@@ -184,6 +207,12 @@ const exampleWorkflow: Workflow = {
         {
           name: "Hello world",
           run: "echo Hello world"
+        },
+        {
+          name: "Checkout",
+          ...checkout({
+            token: "${{ secrets.GITHUB_TOKEN }}",
+          })
         }
       ]
     }
